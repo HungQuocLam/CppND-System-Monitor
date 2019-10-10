@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "linux_parser.h"
 
@@ -35,15 +36,15 @@ string LinuxParser::OperatingSystem() {
 
 // DONE: An example of how to read data from the filesystem
 string LinuxParser::Kernel() {
-  string os, kernel;
+  string os, kernel, version;
   string line;
   std::ifstream stream(kProcDirectory + kVersionFilename);
   if (stream.is_open()) {
     std::getline(stream, line);
     std::istringstream linestream(line);
-    linestream >> os >> kernel;
+    linestream >> os >> version >> kernel;
   }
-  return kernel;
+  return (version + " " + kernel);
 }
 
 // BONUS: Update this to use std::filesystem
@@ -67,7 +68,31 @@ vector<int> LinuxParser::Pids() {
 }
 
 // TODO: Read and return the system memory utilization
-float LinuxParser::MemoryUtilization() { return 0.0; }
+float LinuxParser::MemoryUtilization() { 
+  string line;
+  string key;
+  string value;
+  float mem_total, mem_free;
+  std::ifstream filestream(kProcDirectory+kMeminfoFilename);
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      std::istringstream linestream(line);
+
+      while (linestream >> key >> value) {
+        if (key == "MemTotal:") {
+          mem_total = std::stof(value);
+          //std::cout <<  "MemTotal:"<< value << std::endl;  
+        }
+        else if (key == "MemFree:") {
+          mem_free = std::stof(value);
+          //std::cout <<  "MemFree:" << value << std::endl;   
+        }
+      }
+    }
+  }
+  
+  return ((mem_total - mem_free)/mem_total); 
+}
 
 // TODO: Read and return the system uptime
 long LinuxParser::UpTime() { return 0; }
@@ -86,13 +111,74 @@ long LinuxParser::ActiveJiffies() { return 0; }
 long LinuxParser::IdleJiffies() { return 0; }
 
 // TODO: Read and return CPU utilization
-vector<string> LinuxParser::CpuUtilization() { return {}; }
+vector<string> LinuxParser::CpuUtilization() { 
+  string line;
+  string key;
+  string cpu_time;
+  vector<string> value;
+  
+  std::ifstream filestream(kProcDirectory+kStatFilename);
+  if (filestream.is_open()) {
+    std::getline(filestream, line);
+    std::istringstream linestream(line);
+    while (linestream >> key) {
+      if (key == "cpu") {
+        for (int i=0; i < 10; i++){
+          linestream >> cpu_time;
+          value.push_back(cpu_time);
+          //std::cout << cpu_time << std::endl;
+        }
+      }
+    }  
+  }
+  return value; 
+}
 
 // TODO: Read and return the total number of processes
-int LinuxParser::TotalProcesses() { return 0; }
+int LinuxParser::TotalProcesses() { 
+  string line;
+  string key;
+  string value;
+  int total_processes;
+  std::ifstream filestream(kProcDirectory+kStatFilename);
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      std::istringstream linestream(line);
+
+      while (linestream >> key >> value) {
+        if (key == "processes") {
+          total_processes = std::stof(value);
+          //std::cout <<  "processes:"<< total_processes << std::endl;  
+        }
+      }
+    }
+  }
+ 
+  return total_processes; 
+}
 
 // TODO: Read and return the number of running processes
-int LinuxParser::RunningProcesses() { return 0; }
+int LinuxParser::RunningProcesses() { 
+  string line;
+  string key;
+  string value;
+  int running_processes;
+  std::ifstream filestream(kProcDirectory+kStatFilename);
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      std::istringstream linestream(line);
+
+      while (linestream >> key >> value) {
+        if (key == "procs_running") {
+          running_processes = std::stof(value);
+          //std::cout <<  "processes:"<< running_processes << std::endl;  
+        }
+      }
+    }
+  }
+ 
+  return running_processes; 
+}
 
 // TODO: Read and return the command associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
