@@ -8,16 +8,16 @@
 float Processor::Utilization() { 
     std::vector<std::string> value = LinuxParser::CpuUtilization(); 
 
-    float user          = std::stof(value[0]); 
-    float nice          = std::stof(value[1]);
-    float system        = std::stof(value[2]); 
-    float idle          = std::stof(value[3]); 
-    float iowait        = std::stof(value[4]); 
-    float irq           = std::stof(value[5]); 
-    float softirq       = std::stof(value[6]); 
-    float steal         = std::stof(value[7]); 
-    float guest         = std::stof(value[8]); 
-    float guest_nice    = std::stof(value[9]); 
+    float user          = std::stof(value[LinuxParser::kUser_]); 
+    float nice          = std::stof(value[LinuxParser::kNice_]);
+    float system        = std::stof(value[LinuxParser::kSystem_]); 
+    float idle          = std::stof(value[LinuxParser::kIdle_]); 
+    float iowait        = std::stof(value[LinuxParser::kIOwait_]); 
+    float irq           = std::stof(value[LinuxParser::kIRQ_]); 
+    float softirq       = std::stof(value[LinuxParser::kSoftIRQ_]); 
+    float steal         = std::stof(value[LinuxParser::kSteal_]); 
+    float guest         = std::stof(value[LinuxParser::kGuest_]); 
+    float guest_nice    = std::stof(value[LinuxParser::kGuestNice_]); 
 
     float Total_CPU_time_since_boot = user + nice + system + idle + iowait + irq + softirq + steal;
     //std::cout << Total_CPU_time_since_boot << std::endl;
